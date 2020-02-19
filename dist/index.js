@@ -34,7 +34,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(104);
+/******/ 		return __webpack_require__(130);
 /******/ 	};
 /******/
 /******/ 	// run startup
@@ -50,36 +50,114 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 104:
+/***/ 130:
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-const core = __webpack_require__(470);
-const wait = __webpack_require__(949);
+const core = __webpack_require__(860);
+const wait = __webpack_require__(529);
+
+function Post(data, host, headers, protocol) {
+    const opt = {
+        method: 'POST',
+        headers: headers,
+        rejectUnauthorized: false,
+        timeout: 30000
+    };
+
+    let requestCallback = (resolve)=>{
+        return (result)=>{
+            const encoding = result.headers['content-encoding'];
+            if( encoding === 'undefined'){
+                result.setEncoding('utf-8');
+            }
+            let chunks = '';
+            result.on('data', function(chunk) {
+                    try {
+                    chunks+=(chunk);
+                    } catch(e) {
+                    console.log(e);
+                    }
+                    }).on('end', function(){
+                        if (chunks !== undefined && chunks != null) {
+                        resolve(chunks);
+                        } else {
+                        // 请求获取不到返回值
+                        resolve(opt.host+"无返回值ERROR");
+                        }
+                        })
+        }};
+    Object.assign(opt,{timeout: 15000});
+    return new Promise((resolve, reject) => {
+            let cb = requestCallback(resolve);
+            let req;
+            if (protocol === "http") {
+            req = http.request(host, opt, cb);
+            req.on('error', function (e) {
+                    // request请求失败
+                    console.log(opt.host+'请求失败: ' + e.message);
+                    reject("0");
+                    });
+            req.write(data);
+            req.end();
+            } else if (protocol === "https") {
+            const req = https.request(host, opt, cb);
+            req.on('error', function (e) {
+                    // request请求失败
+                    console.log(opt.host+'请求失败: ' + e.message);
+                    reject("0");
+                    });
+            req.write(data);
+            req.end();
+            }else {
+                reject('5');
+            }
+
+    });
+};
 
 
-// most @actions toolkit packages have async methods
 async function run() {
-  try { 
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`)
+    try { 
+        let postData = querystring.stringify({
+            text: core.getInput('text',{ required: true }),
+            desp: core.getInput('desp')
+            });
 
-    core.debug((new Date()).toTimeString())
-    wait(parseInt(ms));
-    core.debug((new Date()).toTimeString())
-
-    core.setOutput('time', new Date().toTimeString());
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
+        let SCKEY = core.getInput('SCKEY',{ required: true });
+        return send.Post(postData,'sc.ftqq.com',`/${SCKEY}.send`, {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+        },'https');
+    } 
+    catch (error) {
+        console.log(error);
+    }
 }
 
-run()
+run();
 
 
 /***/ }),
 
-/***/ 431:
+/***/ 529:
+/***/ (function(module) {
+
+let wait = function(milliseconds) {
+  return new Promise((resolve, reject) => {
+    if (typeof(milliseconds) !== 'number') { 
+      throw new Error('milleseconds not a number'); 
+    }
+
+    setTimeout(() => resolve("done!"), milliseconds)
+  });
+}
+
+module.exports = wait;
+
+
+/***/ }),
+
+/***/ 562:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -152,7 +230,14 @@ function escape(s) {
 
 /***/ }),
 
-/***/ 470:
+/***/ 622:
+/***/ (function(module) {
+
+module.exports = require("path");
+
+/***/ }),
+
+/***/ 860:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -167,7 +252,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const command_1 = __webpack_require__(431);
+const command_1 = __webpack_require__(562);
 const os = __webpack_require__(87);
 const path = __webpack_require__(622);
 /**
@@ -333,31 +418,6 @@ function group(name, fn) {
 }
 exports.group = group;
 //# sourceMappingURL=core.js.map
-
-/***/ }),
-
-/***/ 622:
-/***/ (function(module) {
-
-module.exports = require("path");
-
-/***/ }),
-
-/***/ 949:
-/***/ (function(module) {
-
-let wait = function(milliseconds) {
-  return new Promise((resolve, reject) => {
-    if (typeof(milliseconds) !== 'number') { 
-      throw new Error('milleseconds not a number'); 
-    }
-
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-}
-
-module.exports = wait;
-
 
 /***/ })
 
