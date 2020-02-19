@@ -1,0 +1,17 @@
+name: 'Server-Chan' 
+description: 'send to server-chan'
+inputs:
+  SCKEY:  # id of input
+    description: 'private SCKEY'
+    required: true
+  text: # title
+    description: 'title'
+    required: true
+  desp: #desp
+    description: 'description'
+    required: false
+    default: ''
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -1,0 +1,28 @@
+name: "units-test"
+on:
+  push:
+    branches:
+      - master
+      - 'releases/*'
+
+jobs:
+  # unit tests
+  units:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: npm ci
+    - run: npm test
+
+  # test action works running from the graph  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get date
+      run: echo "::set-env name=REPORT_DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')"
+    - uses: ./
+      with:
+        SCKEY: ${{ secrets.SCKEY }}
+        text: ${{ env.REPORT_DATE }}
+        desp: ok
