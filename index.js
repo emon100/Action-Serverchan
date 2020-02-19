@@ -55,7 +55,7 @@ async function run() {
             });
 
         let SCKEY = core.getInput('SCKEY',{ required: true });
-        return Post(postData,'sc.ftqq.com',`/${SCKEY}.send`, {
+        return Post(postData,`https://sc.ftqq.com/${SCKEY}.send`, {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': Buffer.byteLength(postData)
         },'https');

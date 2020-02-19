@@ -55,7 +55,6 @@ module.exports = require("os");
 
 const querystring = __webpack_require__(191);
 const core = __webpack_require__(860);
-const wait = __webpack_require__(529);
 const https = __webpack_require__(211);
 
 function Post(data, host, headers) {
@@ -100,7 +99,7 @@ function Post(data, host, headers) {
             req.write(data);
             req.end();
     });
-};
+}
 
 
 async function run() {
@@ -111,7 +110,7 @@ async function run() {
             });
 
         let SCKEY = core.getInput('SCKEY',{ required: true });
-        return Post(postData,'sc.ftqq.com',`/${SCKEY}.send`, {
+        return Post(postData,`https://sc.ftqq.com/${SCKEY}.send`, {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': Buffer.byteLength(postData)
         },'https');
@@ -137,24 +136,6 @@ module.exports = require("querystring");
 /***/ (function(module) {
 
 module.exports = require("https");
-
-/***/ }),
-
-/***/ 529:
-/***/ (function(module) {
-
-let wait = function(milliseconds) {
-  return new Promise((resolve, reject) => {
-    if (typeof(milliseconds) !== 'number') { 
-      throw new Error('milleseconds not a number'); 
-    }
-
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-}
-
-module.exports = wait;
-
 
 /***/ }),
 
