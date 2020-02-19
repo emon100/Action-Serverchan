@@ -1,8 +1,8 @@
 const querystring = require('querystring');
 const core = require('@actions/core');
-const wait = require('./wait');
+const https = require('https');
 
-function Post(data, host, headers, protocol) {
+function Post(data, host, headers) {
     const opt = {
         method: 'POST',
         headers: headers,
@@ -35,17 +35,6 @@ function Post(data, host, headers, protocol) {
     Object.assign(opt,{timeout: 15000});
     return new Promise((resolve, reject) => {
             let cb = requestCallback(resolve);
-            let req;
-            if (protocol === "http") {
-            req = http.request(host, opt, cb);
-            req.on('error', function (e) {
-                    // request请求失败
-                    console.log(opt.host+'请求失败: ' + e.message);
-                    reject("0");
-                    });
-            req.write(data);
-            req.end();
-            } else if (protocol === "https") {
             const req = https.request(host, opt, cb);
             req.on('error', function (e) {
                     // request请求失败
@@ -54,12 +43,8 @@ function Post(data, host, headers, protocol) {
                     });
             req.write(data);
             req.end();
-            }else {
-                reject('5');
-            }
-
     });
-};
+}
 
 
 async function run() {
