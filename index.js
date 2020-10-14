@@ -32,7 +32,6 @@ function Post(data, host, headers) {
                         }
                         })
         }};
-    Object.assign(opt,{timeout: 15000});
     return new Promise((resolve, reject) => {
             let cb = requestCallback(resolve);
             const req = https.request(host, opt, cb);
